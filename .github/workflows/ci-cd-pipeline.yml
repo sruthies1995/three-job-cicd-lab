@@ -1,0 +1,61 @@
+
+name: Multi Branch CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'feature/**'
+
+  workflow_dispatch:
+
+jobs:
+
+  # JOB 1: BUILD
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Build Application
+        run: |
+          echo "Building Application"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Build Completed Successfully"
+
+  # JOB 2: TEST
+  test:
+    name: Test Application
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Run Tests
+        run: |
+          echo "Testing Application"
+          echo "Test Completed Successfully"
+
+  # JOB 3: DEPLOY
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    needs: test
+
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Deploy Application
+        run: |
+          echo "Deploying Application"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Deployment Completed Successfully"
